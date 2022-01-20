@@ -16,6 +16,7 @@ defmodule Derivata do
         IO.write("simplified: #{pprint(simplify(d))}\n")
         IO.write("calculated: #{pprint(simplify(c))}\n")
         :ok
+        #FUCK YOU
     end
 
     def test2() do
