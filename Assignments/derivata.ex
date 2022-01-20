@@ -7,6 +7,7 @@ defmodule Derivata do
     |   {:ln, expr()}
     |   {:div, expr(), expr()}
     |   {:sqrt, expr()}
+    |   {:sin, expr()}
 
     def test() do
         e = {:add,
@@ -47,13 +48,25 @@ defmodule Derivata do
     def test4() do
         e = {:div, {:num, 1}, {:var, :x}}
         d = deriv(e, :x)
-        #c = calc(d, :x, 1)
+        c = calc(d, :x, 1)
         IO.write("expression: #{pprint(e)}\n")
         IO.write("derivative: #{pprint(d)}\n")
         IO.write("simplified: #{pprint(simplify(d))}\n")
-        #IO.write("calculated: #{pprint(simplify(c))}\n")
+        IO.write("calculated: #{pprint(simplify(c))}\n")
         :ok
     end
+
+    def test5() do
+        e = {:sqrt, {:var, :x}}
+        d = deriv(e, :x)
+        c = calc(d, :x, 3)
+        IO.write("expression: #{pprint(e)}\n")
+        IO.write("derivative: #{pprint(d)}\n")
+        IO.write("simplified: #{pprint(simplify(d))}\n")
+        IO.write("calculated: #{pprint(simplify(c))}\n")
+        :ok
+    end
+
 
 
     #Derivera en konstant
@@ -96,6 +109,25 @@ defmodule Derivata do
         {:div, deriv(e, v), e}
     end
 
+    def deriv({:sqrt, e}, v) do
+        {:mul,
+            {:div,
+                {:mul,
+                    {:num, -1},
+                    {:num, 1}
+                },
+                {:num, 2}
+            },
+            {:mul,
+                deriv(e, v),
+                {:div,
+                    {:num, 1},
+                    {:sqrt, e}
+                }
+            }
+        }
+
+    end
     def calc({:num, n}, _, _) do {:num, n} end
     def calc({:var, v}, v, n) do {:num, n} end
     def calc({:var, v}, _, _) do {:var, v} end
@@ -110,6 +142,9 @@ defmodule Derivata do
     end
     def calc({:div, e1, e2}, v, n) do
         {:div, calc(e1, v, n), calc(e2, v, n)}
+    end
+    def calc({:sqrt, e}, v, n) do
+        {:sqrt, calc(e, v, n)}
     end
 
     
@@ -127,6 +162,9 @@ defmodule Derivata do
     def simplify({:div, e1, e2}) do
         simplify_div(simplify(e1), simplify(e2))
     end
+    def simplify({:sqrt, e}) do
+        simplify_sqrt(simplify(e))
+    end
     def simplify(e) do e end
 
     def simplify_add({:num, 0}, e2) do e2 end
@@ -143,8 +181,13 @@ defmodule Derivata do
 
     def simplify_div(e1, {:num, 1}) do e1 end
     def simplify_div({:num, 0}, _) do {:num, 0} end
-    def simplify_div({:num, n1}, {:num, n2}) do {:num, div(n1, n2)} end
+    def simplify_div({:num, n1}, {:num, n2}) do {:num, n1/n2} end
     def simplify_div(e1, e2) do {:div, e1, e2} end
+
+    def simplify_sqrt({:num, 0}) do {:num, 0} end
+    def simplify_sqrt({:num, 1}) do {:num, 1} end
+    def simplify_sqrt({:num, n1}) do {:num, :math.sqrt(n1)} end
+    def simplify_sqrt(e) do {:sqrt, e} end
 
     def simplify_exp(_,{:num, 0}) do {:num, 0} end
     def simplify_exp(e1,{:num, 1}) do e1 end
@@ -158,7 +201,8 @@ defmodule Derivata do
     def pprint({:add, e1, e2}) do "(#{pprint(e1)} + #{pprint(e2)})" end
     def pprint({:mul, e1, e2}) do "#{pprint(e1)} * #{pprint(e2)}" end
     def pprint({:exp, e1, e2}) do "(#{pprint(e1)})^(#{pprint(e2)})" end
-    def pprint({:div, e1, e2}) do "(#{pprint(e1)})/(#{pprint(e2)})" end
+    def pprint({:div, e1, e2}) do "(#{pprint(e1)}/  #{pprint(e2)})" end
+    def pprint({:sqrt, e}) do "sqrt(#{pprint(e)})" end
     def pprint({:ln, e}) do "ln (#{pprint(e)})" end
 
 end
