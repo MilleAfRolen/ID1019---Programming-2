@@ -69,7 +69,7 @@ defmodule Derivata do
     end
 
     def test6() do
-        e = {:sin, {:var, :x}}
+        e = {:sin, {:mul, {:exp, {:var, :x}, {:num, 2}}, {:num, 2}}}
         d = deriv(e, :x)
         c = calc(d, :x, 0)
         IO.write("expression: #{pprint(e)}\n")
@@ -210,6 +210,7 @@ defmodule Derivata do
     def simplify_mul({:num, 1}, e2) do e2 end
     def simplify_mul(e1, {:num, 1}) do e1 end
     def simplify_mul({:num, n1}, {:num, n2}) do {:num, n1*n2} end
+    def simplify_mul({:mul, {:num, n1}, e={:var, _}}, {:num, n2}) do {:mul, {:num, n1*n2}, e} end
     def simplify_mul(e1, e2) do {:mul, e1, e2} end
 
     def simplify_div(e1, {:num, 1}) do e1 end
@@ -238,8 +239,10 @@ defmodule Derivata do
     def pprint({:num, n}) do "#{n}" end
     def pprint({:var, v}) do "#{v}" end
     def pprint({:add, e1, e2}) do "(#{pprint(e1)} + #{pprint(e2)})" end
+    def pprint({:mul, e1={:num, _}, e2={:var, _}}) do "#{pprint(e1)}#{pprint(e2)}" end
+    def pprint({:mul, e1={:num, _}, {:exp, e2={:var, _}, e3}}) do "(#{pprint(e1)}#{pprint(e2)})^(#{pprint(e3)})" end
     def pprint({:mul, e1, e2}) do "#{pprint(e1)} * #{pprint(e2)}" end
-    def pprint({:exp, e1, e2}) do "(#{pprint(e1)})^(#{pprint(e2)})" end
+    def pprint({:exp, e1, e2}) do "#{pprint(e1)}^(#{pprint(e2)})" end
     def pprint({:div, e1, e2}) do "(#{pprint(e1)}/#{pprint(e2)})" end
     def pprint({:sqrt, e}) do "sqrt(#{pprint(e)})" end
     def pprint({:sin, e}) do "sin(#{pprint(e)})" end
