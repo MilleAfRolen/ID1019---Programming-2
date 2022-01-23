@@ -170,10 +170,6 @@ defmodule Derivata do
         {:cos, calc(e, v, n)}
     end
 
-
-    
-
-    
     def simplify({:add, e1, e2}) do
         simplify_add(simplify(e1), simplify(e2))
     end
