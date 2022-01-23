@@ -12,8 +12,8 @@ defmodule Derivata do
 
     def test() do
         e = {:add,
-            {:mul, {:num, 2}, {:var, :x}},
-            {:num, 4}}
+            {:mul, {:num, 2}, {:exp, {:var, :x}, {:num, 2}}},
+            {:mul, {:num, 4}, {:mul, {:var, :x}, {:var, :y}}}}
         d = deriv(e, :x)
         c = calc(d, :x, 5)
         IO.write("expression: #{pprint(e)}\n")
@@ -60,7 +60,7 @@ defmodule Derivata do
     def test5() do
         e = {:sqrt, {:var, :x}}
         d = deriv(e, :x)
-        c = calc(d, :x, 3)
+        c = calc(d, :x, 4)
         IO.write("expression: #{pprint(e)}\n")
         IO.write("derivative: #{pprint(d)}\n")
         IO.write("simplified: #{pprint(simplify(d))}\n")
@@ -124,10 +124,7 @@ defmodule Derivata do
     def deriv({:sqrt, e}, v) do
         {:mul,
             {:div,
-                {:mul,
-                    {:num, -1},
-                    {:num, 1}
-                },
+                {:num, 1},
                 {:num, 2}
             },
             {:mul,
@@ -211,6 +208,7 @@ defmodule Derivata do
     def simplify_mul(e1, {:num, 1}) do e1 end
     def simplify_mul({:num, n1}, {:num, n2}) do {:num, n1*n2} end
     def simplify_mul({:mul, {:num, n1}, e={:var, _}}, {:num, n2}) do {:mul, {:num, n1*n2}, e} end
+    def simplify_mul({:num, n1}, {:mul, {:num, n2}, e={:var, _}}) do {:mul, {:num, n1*n2}, e} end
     def simplify_mul(e1, e2) do {:mul, e1, e2} end
 
     def simplify_div(e1, {:num, 1}) do e1 end
