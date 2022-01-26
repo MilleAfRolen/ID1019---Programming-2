@@ -58,7 +58,7 @@ defmodule Derivata do
     end
 
     def test5() do
-        e = {:sqrt, {:var, :x}}
+        e = {:exp, {:var, :x}, {:num, 0.5}}
         d = deriv(e, :x)
         c = calc(d, :x, 4)
         IO.write("expression: #{pprint(e)}\n")
@@ -99,8 +99,15 @@ defmodule Derivata do
 
     def deriv({:exp, e, {:num, n}}, v) do
         {:mul, 
-        {:mul, {:num, n}, {:exp, e, {:num, n-1}}},
-        deriv(e, v)}
+            {:mul, 
+                {:num, n}, 
+                {:exp, 
+                    e, 
+                    {:num, n-1}
+                }
+            },
+            deriv(e, v)
+        }
     end
 
     def deriv({:div, e1, e2}, v) do
