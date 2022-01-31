@@ -112,14 +112,15 @@ defmodule Program do
             read(t, adress)
         end
     end
-
+    
+    def write([], adress, value, new) do
+        Register.reverse(new) ++ [{{:label, adress}, {:word, value}}]
+    end
     def write([h|t], adress, value, new) do
         {{:label, adr}, {:word, _}} = h
         cond do
             adr == adress ->
                 Register.reverse(new) ++ [{{:label, adr}, {:word, value}}|t]
-            [h|t] == [] -> 
-                Register.reverse(new) ++ {{:label, adr}, {:word, value}}
             true ->
                 write(t, adress, value, [h|new])
         end
