@@ -1,6 +1,23 @@
 defmodule Emulator do
 
 
+    def test() do
+        code =  [
+            {:addi, 1, 0, 5}, {:lw, 2, 0, :arg}, {:add, 4, 2, 1}, {:addi, 5, 0, 1}, {:label, :loop},
+            {:sub, 4, 4, 5}, {:out, 4}, {:bne, 4, 0, :loop}, :halt
+        ]
+        data = [{{:label, :arg}, {:word, 12}}]
+        run({:prgm, code, data})
+    end
+
+    def test2() do
+        code =  [
+            {:addi, 1, 0, 5}, {:sw, 1, 0, :baja}, {:lw, 2, 0, :baja}, {:out, 2}, :halt
+        ]
+        data = [{{:label, :arg}, {:word, 12}}]
+        run({:prgm, code, data})
+    end
+
     def run(prgm) do
         {code, data} = Program.load(prgm)
         out = Out.new()
@@ -39,22 +56,39 @@ defmodule Emulator do
             {:lw, rt, rs, imm} ->
                 pc = pc + 4
                 s = Register.read(reg, rs)
-
+                value = Program.read(mem, imm)
+                reg = Register.write(reg, rt, value)
+                run(pc, code, reg, mem, out)
             {:sw, rt, rs, imm} ->
                 pc = pc + 4
-                t = Register.read(reg, rs)
-                reg = Register.write(reg, rt, t + imm)
-            {:beq, rs, rt, offset} ->
+                s = Register.read(reg, rs)
+                value = Register.read(reg, rt)
+                mem = Program.write(mem, imm, value, [])
+                run(pc, code, reg, mem, out)
+            {:beq, rs, rt, adress} ->
                 s = Register.read(reg, rs)
                 t = Register.read(reg, rt)
                 cond do 
                     s == t ->
-                        pc = pc + 4 + offset
+                        pc = Program.read(mem, adress)
+                        run(pc, code, reg, mem, out)
                     true -> 
                         pc = pc + 4
+                        run(pc, code, reg, mem, out)
                 end
+            {:bne, rs, rt, adress} ->
+                s = Register.read(reg, rs)
+                t = Register.read(reg, rt)
+                cond do 
+                    s != t ->
+                        pc = Program.read(mem, adress)
+                        run(pc, code, reg, mem, out)
+                    true -> 
+                        pc = pc + 4
+                        run(pc, code, reg, mem, out)
+                end 
             {:label, name} ->
-                mem = [{:label, name}, {:word, pc}| mem]
+                mem = [{{:label, name}, {:word, pc}}| mem]
                 pc = pc + 4
                 run(pc, code, reg, mem, out)
         end
@@ -80,13 +114,14 @@ defmodule Program do
     end
 
     def write([h|t], adress, value, new) do
-        {{:label, adr}, {:word, x}} = h
+        {{:label, adr}, {:word, _}} = h
         cond do
             adr == adress ->
-                Register.reverse(new) ++ [{{:label, adr}, {:word, x}}|t]
-            [h|t] == [] -> 0
+                Register.reverse(new) ++ [{{:label, adr}, {:word, value}}|t]
+            [h|t] == [] -> 
+                Register.reverse(new) ++ {{:label, adr}, {:word, value}}
             true ->
-            write(t, adress, value, [h|new])
+                write(t, adress, value, [h|new])
         end
     end
 
