@@ -12,9 +12,9 @@ defmodule Emulator do
 
     def test2() do
         code =  [
-            {:addi, 1, 0, 5}, {:sw, 1, 0, :baja}, {:lw, 2, 0, :baja}, {:out, 2}, :halt
+            {:addi, 1, 0, 5}, {:sw, 1, 0, :hello}, {:lw, 2, 0, :hello}, {:add, 2, 1, 2}, {:sw, 2, 0, :hello}, {:out, 2}, :halt
         ]
-        data = [{{:label, :arg}, {:word, 12}}]
+        data = []
         run({:prgm, code, data})
     end
 
@@ -35,7 +35,6 @@ defmodule Emulator do
                 s = Register.read(reg, rs)
                 out = Out.put(out, s)
                 run(pc, code, reg, mem, out)
-
             {:add, rd, rs, rt} ->
                 pc = pc + 4
                 s = Register.read(reg, rs)
@@ -59,11 +58,11 @@ defmodule Emulator do
                 value = Program.read(mem, imm)
                 reg = Register.write(reg, rt, value)
                 run(pc, code, reg, mem, out)
-            {:sw, rt, rs, imm} ->
+            {:sw, rt, rs, adr} ->
                 pc = pc + 4
                 s = Register.read(reg, rs)
                 value = Register.read(reg, rt)
-                mem = Program.write(mem, imm, value, [])
+                mem = Program.write(mem, adr, value, [])
                 run(pc, code, reg, mem, out)
             {:beq, rs, rt, adress} ->
                 s = Register.read(reg, rs)
@@ -88,7 +87,7 @@ defmodule Emulator do
                         run(pc, code, reg, mem, out)
                 end 
             {:label, name} ->
-                mem = [{{:label, name}, {:word, pc}}| mem]
+               mem = [{{:label, name}, {:word, pc}}| mem]
                 pc = pc + 4
                 run(pc, code, reg, mem, out)
         end
