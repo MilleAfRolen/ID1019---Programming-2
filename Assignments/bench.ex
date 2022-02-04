@@ -31,15 +31,45 @@ defmodule Bench do
     :ok
   end
   
-  def list_new() do ... end
-  
-  def list_insert(e, l) do 
-     :
+  def list_new() do [] end
+  def list_insert(e, []) do [e] end
+  def list_insert(e, l = [h|t]) do
+    cond do
+      e < h -> [e|l]
+      e >= h -> [h| list_insert(e, t)]
+    end
   end
   
-  def tree_new() do ... end
-  
-  def tree_insert(e, l) do 
-     :
+  def tree_new() do :nil end
+  def tree_insert(e, :nil) do {:node, e, :nil, :nil} end  
+  def tree_insert(e, {:node, e2, branch1, branch2}) do
+    cond do
+      e < e2 -> 
+      {:node, e2, tree_insert(e, branch1), branch2}
+      e >= e2 -> 
+      {:node, e2, branch1, tree_insert(e, branch2)}
+    end
   end
+
+def test() do
+    list = list_new()
+    list = list_insert(16, list)
+    list = list_insert(10, list)
+    list = list_insert(93, list)
+    list = list_insert(94, list)
+    list = list_insert(69, list)
+    IO.write(inspect(list))
+
+        IO.write("\n\n")
+
+    list = tree_new()
+    list = tree_insert(16, list)
+    list = tree_insert(10, list)
+    list = tree_insert(93, list)
+    list = tree_insert(94, list)
+    list = tree_insert(69, list)
+    IO.write(inspect(list))
+  end
+
+end
     
