@@ -113,13 +113,13 @@ defmodule Program do
     end
     
     def write([], adress, value, new) do
-        Register.reverse(new) ++ [{{:label, adress}, {:word, value}}]
+        Enum.reverse(new) ++ [{{:label, adress}, {:word, value}}]
     end
     def write([h|t], adress, value, new) do
         {{:label, adr}, {:word, _}} = h
         cond do
             adr == adress ->
-                Register.reverse(new) ++ [{{:label, adr}, {:word, value}}|t]
+                Enum.reverse(new) ++ [{{:label, adr}, {:word, value}}|t]
             true ->
                 write(t, adress, value, [h|new])
         end
@@ -137,69 +137,51 @@ defmodule Register do
 
     def new() do
         [
-        {0, 0},
-        {1, 0},
-        {2, 0},
-        {3, 0},
-        {4, 0},
-        {5, 0},
-        {6, 0},
-        {7, 0},
-        {8, 0},
-        {9, 0},
-        {10, 0},
-        {11, 0},
-        {12, 0},
-        {13, 0},
-        {14, 0},
-        {15, 0},
-        {16, 0},
-        {17, 0},
-        {18, 0},
-        {19, 0},
-        {20, 0},
-        {21, 0},
-        {22, 0},
-        {23, 0},
-        {24, 0},
-        {25, 0},
-        {26, 0},
-        {27, 0},
-        {28, 0},
-        {29, 0},
-        {30, 0},
-        {31, 0},
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         ]
     end
 
-    def read([h|t], nbr) do
-        {n, value} = h
-        cond do
-            nbr == n ->
-                value
-            true ->
-                read(t, nbr)
-        end
+    def read(reg, regNbr) do
+        Enum.at(reg, regNbr)
     end
 
-    def write(reg, nbr, value) do
-        write(reg, nbr, value, [])
+    def write(reg, regNbr, value) do
+        write(reg, regNbr, value, [])
     end
-    def write([h|t], nbr, value, new) do
-        {n, _} = h
-        cond do
-            nbr == n ->
-                reverse(new) ++ [{nbr, value}|t]
-            true -> 
-                write(t, nbr, value, [h|new])
-        end
+    def write(old, regNbr, value, new) do
+        new = List.replace_at(old, regNbr, value)
     end
-    def reverse([]) do
-        []
-    end
-    def reverse([h|t]) do
-        reverse(t) ++ [h]
-    end
+
 
 end
 

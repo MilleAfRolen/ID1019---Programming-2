@@ -31,7 +31,23 @@ defmodule Prim do
         end
     end
 
+    def third(_, [], _) do [] end
+    def third(n) do
+        [h|t] = Enum.to_list(2..n)
+        third([h|t], [])
+    end
+    def third([h|t], primes = []) do
+        findPrimes(t, [h], [h])
+    end
 
+    def findPrimes([], _, savedPrimes) do Enum.reverse(savedPrimes) end
+    def findPrimes([h|t], [], savedPrimes) do findPrimes(t, [h] ++ savedPrimes, [h] ++ savedPrimes) end
+    def findPrimes([h|t],primes = [h2|t2], savedPrimes) do
+        cond do
+            rem(h, h2) == 0 -> findPrimes(t, savedPrimes, savedPrimes)
+            rem(h, h2) != 0 -> findPrimes([h|t], t2, savedPrimes)
+        end
+    end
 
 
 end
