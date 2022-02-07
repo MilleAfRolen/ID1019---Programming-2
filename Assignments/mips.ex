@@ -174,14 +174,9 @@ defmodule Register do
     def read(reg, regNbr) do
         Enum.at(reg, regNbr)
     end
-
     def write(reg, regNbr, value) do
-        write(reg, regNbr, value, [])
+        List.replace_at(reg, regNbr, value)
     end
-    def write(old, regNbr, value, new) do
-        new = List.replace_at(old, regNbr, value)
-    end
-
 
 end
 
