@@ -5,7 +5,7 @@ defmodule Env do
 
 
     def add(id, str, env) do
-    [{id, str} | env]
+        [{id, str} | env]
     end
 
     def lookup(_, []) do nil end
