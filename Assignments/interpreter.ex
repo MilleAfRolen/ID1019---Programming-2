@@ -23,7 +23,5 @@ defmodule Env do
             ids == x -> t
             true -> remove(ids, t)
         end
-
     end
-
 end

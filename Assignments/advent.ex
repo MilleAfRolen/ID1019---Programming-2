@@ -30,7 +30,6 @@ defmodule Day1 do
         end
     end
 
-    
     def sum3(list=[h2|t2], new=[h|t]) do
         cond do
             Enum.at(list, 2) == nil -> new
