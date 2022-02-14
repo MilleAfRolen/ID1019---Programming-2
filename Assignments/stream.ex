@@ -13,8 +13,11 @@ defmodule Primes do
         end
     end
 
+    #[2,3,5,7,11,13,17,19,23,29,31]
     def sieve(fun, p) do
-        
+        {n, fun2} = filter(fun, p)
+        {n, fn() -> filter(fun2, n) end}
+
 
     end
 end
