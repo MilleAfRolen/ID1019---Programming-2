@@ -85,7 +85,7 @@ defmodule Emulator do
                         run(pc, code, reg, mem, out)
                 end 
             {:label, name} ->
-               mem = [{{:label, name}, {:word, pc}}| mem]
+                mem = [{{:label, name}, {:word, pc}}| mem]
                 pc = pc + 4
                 run(pc, code, reg, mem, out)
         end
@@ -106,13 +106,16 @@ defmodule Program do
                 x
             [h|t] == [] -> 0
             true ->
-            read(t, adress)
+                read(t, adress)
         end
     end
     
     def write([], adress, value, new) do
         Enum.reverse(new) ++ [{{:label, adress}, {:word, value}}]
     end
+    #SPAMMAR MEMORY MED LABELS NÄR DEN HOPPAR
+    #KAN INTE HOPPA FRAMMÅT
+    #
     def write([h|t], adress, value, new) do
         {{:label, adr}, {:word, _}} = h
         cond do

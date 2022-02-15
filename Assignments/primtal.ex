@@ -26,7 +26,7 @@ defmodule Second do
         end
     end
 
-        def checkPrime(_, []) do true end
+    def checkPrime(_, []) do true end
     def checkPrime([h|t], primes = [h2|t2]) do
         cond do
             rem(h, h2) == 0 ->
