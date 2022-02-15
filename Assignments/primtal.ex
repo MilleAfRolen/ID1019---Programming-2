@@ -72,7 +72,8 @@ defmodule Third do
 
     def third(list, primes) do
         case list do
-            [] -> Enum.reverse(primes)
+            [] -> 
+                Enum.reverse(primes)
             [h|t] -> 
                 bool = checkPrime(list, primes)
                 primes = insertPrime(bool, h, primes)
@@ -84,11 +85,9 @@ end
 defmodule Bench do
 
     def bench(n) do
-        IO.inspect(:timer.tc(fn -> First.first(n) end))
+        IO.inspect(:timer.tc(fn -> "#{First.first(n)}" end))
         IO.inspect(:timer.tc(fn -> Second.second(n) end))
         IO.inspect(:timer.tc(fn -> Third.third(n) end))
-
-        :ok
     end
 
 end

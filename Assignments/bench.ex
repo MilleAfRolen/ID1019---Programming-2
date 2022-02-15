@@ -45,9 +45,9 @@ defmodule Bench do
   def tree_insert(e, {:node, e2, branch1, branch2}) do
     cond do
       e < e2 -> 
-      {:node, e2, tree_insert(e, branch1), branch2}
+        {:node, e2, tree_insert(e, branch1), branch2}
       e >= e2 -> 
-      {:node, e2, branch1, tree_insert(e, branch2)}
+        {:node, e2, branch1, tree_insert(e, branch2)}
     end
   end
 
