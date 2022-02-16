@@ -13,7 +13,6 @@ defmodule Primes do
         def reduce(primes, {:suspend, acc}, fun) do
             {:suspended, acc, fn(cmd) -> reduce(primes, cmd, fun) end}
         end
-
         def reduce(primes, {:cont, acc}, fun) do
             {p, next} = Primes.next(primes)
             reduce(next, fun.(p,acc), fun)
