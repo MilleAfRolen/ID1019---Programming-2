@@ -10,30 +10,31 @@ defmodule Day1 do
 
     def measureExample() do
         [h|t] = example()
-        measure([h|t], t)
+        measure([h|t])
     end
     def measureInput() do
         [h|t] = input()
-        measure([h|t], t)
+        measure([h|t])
     end
     def measureSum3() do
-        list = [h|t] = input()
-        [h2|t2] = sum3(list, [Enum.at(list,0) + Enum.at(list,1) + Enum.at(list,2)])
-        measure([h2|t2], t2)
+        list = input()
+        new = sum3(list)
+        measure(new)
     end
 
-    def measure([h], []) do 0 end
-    def measure([h|t], [h2|t2]) do
+    def measure([_]) do 0 end
+    def measure([h1, h2|t]) do
         cond do
-            h2 > h -> 1 + measure(t, t2)
-            true -> measure(t, t2)
+            h2 > h1 -> 1 + measure([h2|t])
+            true -> measure([h2|t])
         end
     end
 
-    def sum3(list=[h2|t2], new=[h|t]) do
+
+    def sum3(list=[h1, h2, h3|t]) do
         cond do
-            Enum.at(list, 2) == nil -> new
-            true -> [Enum.at(list,0) + Enum.at(list,1) + Enum.at(list,2) | sum3(t2, new)]
+            t == [] -> [h1 + h2 + h3]
+            true -> [h1 + h2 + h3 | sum3([h2 |[h3 | t]])]
         end
     end
 
