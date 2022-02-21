@@ -100,6 +100,4 @@ defmodule Memo do
 
     def lookup(mem, key) do Map.get(mem, :binary.list_to_bin(key)) end
 
-
-
 end
