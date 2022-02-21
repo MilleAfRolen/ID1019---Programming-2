@@ -43,17 +43,36 @@ defmodule Lumber do
 
     def cost2([]) do {0, :na} end
     def cost2(seq) do
-        {cost, tree, _} = cost2(seq, Memo.new())
+        {cost, tree, _} = cost2(Enum.sort(seq), Memo.new())
         {cost, tree}
     end
     def cost2([s], mem) do {0, s, mem} end
-    def cost2(seq, mem) do
-        {c, t, mem} = cost2(seq, 0, [], [], mem)
+    def cost2([s|rest]=seq, mem) do
+        {c, t, mem} = cost2(rest, s, [s], [], mem)
         {c, t, Memo.add(mem, seq, {c, t})}
     end
-    def cost2(seq=[s|rest], l, left, right, mem) do
-        {cl, tl, mem} = check([s|rest], mem)
-        {cl, tl}
+    def cost2([], l, left, right, mem) do
+        {cl, tl, mem} = check(Enum.reverse(left), mem)
+        {cr, tr, mem} = check(Enum.reverse(right), mem)
+        {cr+cl+l, {tl, tr}, mem}
+    end
+    def cost2([s], l, left, [], mem) do
+        {c, t, mem} = check(Enum.reverse(left), mem)
+        {c+s+l, {t, s}, mem}
+    end
+    def cost2([s], l, [], right, mem) do
+        {c, t, mem} = check(Enum.reverse(right), mem)
+        {c+s+l, {t, s}, mem}
+    end
+
+    def cost2([s|rest], l, left, right, mem) do
+        {cl, tl, mem} = cost2(rest, l+s, [s|left], right, mem)
+        {cr, tr, mem} = cost2(rest, l+s, left, [s|right], mem)
+        if cl < cr do
+            {cl, tl, mem}
+        else
+            {cr, tr, mem}
+        end
     end
     
     def check(seq, mem) do
@@ -77,9 +96,9 @@ defmodule Memo do
 
     def new() do %{} end
 
-    def add(mem, key, val) do Map.put(mem, key, val) end
+    def add(mem, key, val) do Map.put(mem, :binary.list_to_bin(key), val) end
 
-    def lookup(mem, key) do Map.get(mem, key) end
+    def lookup(mem, key) do Map.get(mem, :binary.list_to_bin(key)) end
 
 
 
