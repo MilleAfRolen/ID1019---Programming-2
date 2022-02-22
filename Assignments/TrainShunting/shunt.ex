@@ -14,10 +14,10 @@ defmodule Shunt do
             [] -> []
             [h|t] -> 
                 {hs, ts} = split(xs, h)
-                Moves.single({:one, length(h)}, [], [])
+                pp = Moves.single({:one, length(ts)}, {xs, [], []})
+                pp2 = Moves.single({:two, length(hs)}, pp)
+                pp3 = Moves.single({:one, -(length(ts))}, pp2)
+                Moves.single({:two, -(length(hs))}, pp3)
         end
-
     end
-
-
 end
