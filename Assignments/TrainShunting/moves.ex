@@ -1,5 +1,5 @@
 defmodule Moves do
-    alias Train
+    
 
     def single({:one, n}, {main, one, two}) do
         cond do
@@ -31,8 +31,5 @@ defmodule Moves do
             [] -> [state]
             [h|t] -> [state | move(t, single(h, state))]
         end
-
     end
-
-
 end

@@ -43,13 +43,13 @@ defmodule Lumber do
 
     def cost2([]) do {0, :na} end
     def cost2(seq) do
-        {cost, tree, _} = cost2(Enum.sort(seq), Memo.new())
+        {cost, tree, _} = cost2(Enum.sort(seq), Tree.new())
         {cost, tree}
     end
     def cost2([s], mem) do {0, s, mem} end
     def cost2([s|rest]=seq, mem) do
         {c, t, mem} = cost2(rest, s, [s], [], mem)
-        {c, t, Memo.add(mem, seq, {c, t})}
+        {c, t, Tree.add(mem, seq, {c, t})}
     end
     def cost2([], l, left, right, mem) do
         {cl, tl, mem} = check(Enum.reverse(left), mem)
@@ -76,7 +76,7 @@ defmodule Lumber do
     end
     
     def check(seq, mem) do
-        case Memo.lookup(mem, seq) do
+        case Tree.lookup(mem, seq) do
             nil -> 
                 cost2(seq, mem)
             {c, t} -> 
@@ -99,5 +99,33 @@ defmodule Memo do
     def add(mem, key, val) do Map.put(mem, :binary.list_to_bin(key), val) end
 
     def lookup(mem, key) do Map.get(mem, :binary.list_to_bin(key)) end
+
+end
+
+defmodule Tree do
+  def new() do [] end
+  def add(mem, [n], val) do insert(mem, n, val) end
+  def add(mem, [n|ns], val) do add(mem, n, ns, val) end
+
+  def add([], n, rest, value) do [{n, nil, add([], rest, value)}] end
+  def add([{n, val, sub}|mem], n, rest, value) do [{n, val, add(sub, rest, value)}|mem] end  
+  def add([first|mem], n, rest, value) do [first| add(mem, n, rest, value)] end  				   
+
+  def insert([], n, val) do [{n, val, []}] end
+  def insert([{n, nil, sub}|mem], n, val) do [{n, val, sub}|mem] end  
+  def insert([first|mem], n, val) do [first| insert(mem, n, val)] end  
+
+  def lookup([], _) do nil end
+  def lookup(mem, [n]) do val(mem, n) end
+  def lookup(mem, [n|ns]) do lookup(mem, n, ns) end
+
+  def lookup([], _, _) do nil end
+  def lookup([{n, _, sub}|_], n, ns) do lookup(sub, ns) end
+  def lookup([_|mem], n, ns) do lookup(mem, n, ns) end    
+
+  def val([], _) do nil end
+  def val([{n, val, _}|_], n) do val end
+  def val([_|rest], n) do val(rest, n) end    
+
 
 end

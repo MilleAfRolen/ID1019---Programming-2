@@ -31,5 +31,4 @@ defmodule Train do
             true -> 1 + position(t, y)
         end
     end
-
 end
