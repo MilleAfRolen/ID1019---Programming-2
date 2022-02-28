@@ -37,4 +37,24 @@ defmodule Shunt do
                 [{:one, length(ts)+1}, {:two, length(hs)}, {:one, -(length(ts)+1)}, {:two, -(length(hs))}| few(t2, t)]
         end
     end
+
+
+    def rules([]) do [] end
+    def rules([{x, n}, {x, m} | t]) do
+        [{x, n+m}|t]
+    end
+    def rules([{x, 0} | t]) do
+        t
+    end
+    def rules(ns) do
+        ns
+    end
+    def compress(ms) do
+        ns = rules(ms)
+        if ns == ms do
+            ms
+        else
+            compress(ns)
+        end
+    end
 end
