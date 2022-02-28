@@ -43,7 +43,7 @@ defmodule Lumber do
 
     def cost2([]) do {0, :na} end
     def cost2(seq) do
-        {cost, tree, _} = cost2(Enum.sort(seq), Tree.new())
+        {cost, tree, _} = cost2(Enum.sort(seq), Memo.new())
         {cost, tree}
     end
     def cost2([s], mem) do {0, s, mem} end
@@ -103,29 +103,30 @@ defmodule Memo do
 end
 
 defmodule Tree do
-  def new() do [] end
-  def add(mem, [n], val) do insert(mem, n, val) end
-  def add(mem, [n|ns], val) do add(mem, n, ns, val) end
+    def new() do [] end
 
-  def add([], n, rest, value) do [{n, nil, add([], rest, value)}] end
-  def add([{n, val, sub}|mem], n, rest, value) do [{n, val, add(sub, rest, value)}|mem] end  
-  def add([first|mem], n, rest, value) do [first| add(mem, n, rest, value)] end  				   
+    def add(mem, [h], val) do addToTree(mem, h, val) end
+    def add(mem, [h|t], val) do add(mem, h, t, val) end 
 
-  def insert([], n, val) do [{n, val, []}] end
-  def insert([{n, nil, sub}|mem], n, val) do [{n, val, sub}|mem] end  
-  def insert([first|mem], n, val) do [first| insert(mem, n, val)] end  
+    def add([], h, rest, value) do [{h, nil, add([], rest, value)}] end
+    def add([{h, val, branch}|mem], h, rest, value) do [{h, val, add(branch, rest, value)}|mem] end  
+    def add([first|mem], h, rest, value) do [first| add(mem, h, rest, value)] end  				   
 
-  def lookup([], _) do nil end
-  def lookup(mem, [n]) do val(mem, n) end
-  def lookup(mem, [n|ns]) do lookup(mem, n, ns) end
+    def addToTree([], h, val) do [{h, val, []}] end
+    def addToTree([{h, nil, branch}|mem], h, val) do [{h, val, branch}|mem] end  
+    def addToTree([first|mem], h, val) do [first| insert(mem, h, val)] end  
 
-  def lookup([], _, _) do nil end
-  def lookup([{n, _, sub}|_], n, ns) do lookup(sub, ns) end
-  def lookup([_|mem], n, ns) do lookup(mem, n, ns) end    
+    def lookup([], _) do nil end
+    def lookup(mem, [h]) do val(mem, h) end
+    def lookup(mem, [h|t]) do lookup(mem, h, t) end
 
-  def val([], _) do nil end
-  def val([{n, val, _}|_], n) do val end
-  def val([_|rest], n) do val(rest, n) end    
+    def lookup([], _, _) do nil end
+    def lookup([{h, _, branch}|_], h, t) do lookup(branch, t) end
+    def lookup([_|mem], h, t) do lookup(mem, h, t) end    
+
+    def val([], _) do nil end
+    def val([{n, val, _}|_], n) do val end
+    def val([_|t], n) do val(t, n) end   
 
 
 end
