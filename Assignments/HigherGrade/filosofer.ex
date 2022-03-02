@@ -105,7 +105,6 @@ defmodule Dinner do
     c3 = Chopstick.start()
     c4 = Chopstick.start()
     c5 = Chopstick.start()
-    IO.puts("Pp")
     ctrl = self()
     Philosopher.start(5, c1, c2, "Arendt", ctrl)
     Philosopher.start(5, c2, c3, "Hypatia", ctrl)
