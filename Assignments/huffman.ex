@@ -69,13 +69,12 @@ defmodule Huffman do
     Enum.sort(findPath(tree, [], []), fn({_, path1}, {_, path2}) -> length(path1) < length(path2) end)
   end
 
-
   def findPath({char1, char2}, path, acc) do
     left = findPath(char1, [0 | path], acc) #recursively go down left
     findPath(char2, [1 | path], left) #recursively go down right
   end
-  def findPath(char, code, acc) do
-    [{char, Enum.reverse(code)} | acc]
+  def findPath(char, path, acc) do
+    [{char, Enum.reverse(path)} | acc]
   end
 
   def decode_table(tree) do
@@ -84,9 +83,14 @@ defmodule Huffman do
 
   def encode([], _) do [] end
   def encode([char | rest], table) do
-    {_, code} = List.keyfind(table, char, 0)
-    code ++ encode(rest, table)
-  end 
+    getBin(char, table) ++ encode(rest, table)
+  end
+  def getBin(char, [{char, code} | _]) do
+    code
+  end
+  def getBin(h, [_|t]) do
+    getBin(h, t)
+  end
 
   def decode([], _) do [] end
   def decode(sequence, table) do
@@ -103,27 +107,6 @@ defmodule Huffman do
     end
   end
 
-  def bench(file, n) do
-    {text, b} = read(file, n)
-    c = length(text)
-    {tree, t2} = time(fn -> tree(text) end)
-    {encode, t3} = time(fn -> encode_table(tree) end)
-    s = length(encode)
-    {decode, _} = time(fn -> decode_table(tree) end)
-    {encoded, t5} = time(fn -> encode(text, encode) end)
-    e = div(length(encoded), 8)
-    r = Float.round(e / b, 3)
-    {_, t6} = time(fn -> decode(encoded, decode) end)
-
-    IO.puts("text of #{c} characters")
-    IO.puts("tree built in #{t2} ms")
-    IO.puts("table of size #{s} in #{t3} ms")
-    IO.puts("encoded in #{t5} ms")
-    IO.puts("decoded in #{t6} ms")
-    IO.puts("source #{b} bytes, encoded #{e} bytes, compression #{r}")
-  end
-
-  # Measure the execution time of a function.
   def time(func) do
     initial = Time.utc_now()
     result = func.()
@@ -131,20 +114,31 @@ defmodule Huffman do
     {result, Time.diff(final, initial, :microsecond) / 1000}
   end
 
- # Get a suitable chunk of text to encode.
-  def read(file, n) do
-   {:ok, fd} = File.open(file, [:read, :utf8])
-    binary = IO.read(fd, n)
-    File.close(fd)
 
-    length = byte_size(binary)
-    case :unicode.characters_to_list(binary, :utf8) do
-      {:incomplete, chars, rest} ->
-        {chars, length - byte_size(rest)}
-      chars ->
-        {chars, length}
-    end
+  def bench(n) do
+    sample = read('text.txt', 1000)
+    text = read('text.txt', n)
+    {tree, t1} = time(fn -> tree(sample) end)
+    {encode, t2} = time(fn -> encode_table(tree) end)
+    {decode, t3} = time(fn -> decode_table(tree) end)
+    {seq, t4} = time(fn -> encode(text, encode) end)
+    {texten, t5} = time(fn -> decode(seq, decode) end)
+
+    IO.puts("#{length(text)} characters")
+    IO.puts("tree built in #{t1} ms")
+    IO.puts("encoded in #{t4} ms")
+    IO.puts("decoded #{t5} ms")
   end
 
+  def read(file, n) do
+    {:ok, file} = File.open(file, [:read, :utf8])
+    binary = IO.read(file, n)
+    case :unicode.characters_to_list(binary, :utf8) do
+      {:incomplete, list, _} ->
+        list
+      list ->
+        list
+    end
+  end
 
 end
